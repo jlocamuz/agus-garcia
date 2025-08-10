@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -28,6 +27,16 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* 🎯 Estilo global para inputs, textareas y selects */
+@layer base {
+  input,
+  textarea,
+  select {
+    @apply text-black;
+  }
 
-
-
+  input::placeholder,
+  textarea::placeholder {
+    @apply text-gray-500; /* o text-black si lo querés igual al texto */
+  }
+}

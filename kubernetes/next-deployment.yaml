@@ -17,3 +17,19 @@ spec:
           image: jlocamuz/next-js-agus-garcia:latest
           ports:
             - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: nextjs-env-secrets
+                  key: DATABASE_URL
+            - name: SECRET_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nextjs-env-secrets
+                  key: SECRET_API_KEY
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nextjs-env-secrets
+                  key: ADMIN_PASSWORD

@@ -64,7 +64,7 @@ export default function Header() {
               className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-olivaclaro hover:text-oliva rounded-xl transition-colors"
             >
               <span className="text-lg">🧠</span>
-              <span className="font-medium">¿En qué te ayudo?</span>
+              <span className="font-medium">Recursos Gratuitos</span>
             </a>
             <a 
               href="#approach" 
