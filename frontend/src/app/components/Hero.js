@@ -54,7 +54,7 @@ export default function Hero() {
 
   if (loading) {
     return (
-      <section className="bg-gradient-to-br from-olivaclaro via-white to-oliva/20 min-h-screen flex items-center">
+      <section id="hero" className="bg-gradient-to-br from-olivaclaro via-white to-oliva/20 min-h-screen flex items-center">
         <div className="w-full px-4 py-8">
           <div className="max-w-sm mx-auto text-center">
             <div className="animate-pulse space-y-8">

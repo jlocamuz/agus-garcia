@@ -13,6 +13,38 @@ export default function Header() {
     setMobileMenuOpen(false)
   }
 
+  // Función para hacer scroll suave - CONTACTO AL FONDO
+  const scrollToSection = (sectionId) => {
+    // Si es contacto, ir al fondo de la página
+    if (sectionId === 'contacto') {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth'
+      });
+      closeMobileMenu();
+      return;
+    }
+
+    // Para las demás secciones, usar offsets normales
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const offsets = {
+        'about': 400,     // Sobre mí: perfecto como está
+        'recursos': 300,  // Recursos: moderado
+        'servicios': 300, // Servicios: moderado
+      };
+      
+      const offset = offsets[sectionId] || 300;
+      const elementPosition = element.offsetTop - offset;
+      
+      window.scrollTo({
+        top: elementPosition,
+        behavior: 'smooth'
+      });
+    }
+    closeMobileMenu();
+  }
+
   return (
     <header className="bg-olivaclaro shadow-sm sticky top-0 z-50 border-b border-oliva/20">
       <nav className="max-w-sm mx-auto px-4">
@@ -50,38 +82,38 @@ export default function Header() {
             : 'max-h-0 opacity-0'
         }`}>
           <div className="bg-white rounded-2xl shadow-lg border border-olivaclaro p-4 space-y-2">
-            <a 
-              href="#about" 
-              onClick={closeMobileMenu}
-              className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-olivaclaro hover:text-oliva rounded-xl transition-colors"
+            <button 
+              onClick={() => scrollToSection('about')}
+              className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-olivaclaro hover:text-oliva rounded-xl transition-colors w-full text-left"
             >
               <span className="text-lg">👋</span>
               <span className="font-medium">Sobre mí</span>
-            </a>
-            <a 
-              href="#services" 
-              onClick={closeMobileMenu}
-              className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-olivaclaro hover:text-oliva rounded-xl transition-colors"
+            </button>
+
+            <button 
+              onClick={() => scrollToSection('servicios')}
+              className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-olivaclaro hover:text-oliva rounded-xl transition-colors w-full text-left"
+            >
+              <span className="text-lg">📋</span>
+              <span className="font-medium">Servicios</span>
+            </button>
+            
+                        
+            <button 
+              onClick={() => scrollToSection('recursos')}
+              className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-olivaclaro hover:text-oliva rounded-xl transition-colors w-full text-left"
             >
               <span className="text-lg">🧠</span>
               <span className="font-medium">Recursos Gratuitos</span>
-            </a>
-            <a 
-              href="#approach" 
-              onClick={closeMobileMenu}
-              className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-olivaclaro hover:text-oliva rounded-xl transition-colors"
-            >
-              <span className="text-lg">📋</span>
-              <span className="font-medium">Modalidades</span>
-            </a>
-            <a 
-              href="#contact" 
-              onClick={closeMobileMenu}
-              className="flex items-center space-x-3 px-4 py-3 text-white bg-oliva hover:bg-oliva/90 rounded-xl transition-colors"
+            </button>
+            
+            <button 
+              onClick={() => scrollToSection('contacto')}
+              className="flex items-center space-x-3 px-4 py-3 text-white bg-oliva hover:bg-oliva/90 rounded-xl transition-colors w-full text-left"
             >
               <span className="text-lg">💬</span>
               <span className="font-medium">Contacto</span>
-            </a>
+            </button>
           </div>
         </div>
       </nav>

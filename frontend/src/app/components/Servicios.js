@@ -55,7 +55,7 @@ export default function Servicios() {
 
   if (loading) {
     return (
-      <section id="approach" className="py-16 bg-white">
+      <section id="servicios" className="py-16 bg-white">
         <div className="px-4">
           <div className="max-w-sm mx-auto text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-oliva mx-auto"></div>
@@ -68,7 +68,7 @@ export default function Servicios() {
 
   return (
     <>
-      <section id="approach" className="py-16 bg-white">
+      <section id="servicios" className="py-16 bg-white">
         <div className="px-4">
           <div className="max-w-sm mx-auto">
             <div className="text-center mb-12">

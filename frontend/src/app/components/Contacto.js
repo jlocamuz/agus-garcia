@@ -1,117 +1,209 @@
-// components/Contacto.js
-"use client"
+'use client';
+
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import { Phone, Mail, MessageCircle, Clock, MapPin } from 'lucide-react';
+
 export default function Contacto() {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Aquí puedes agregar la lógica para enviar el formulario
-    console.log('Formulario enviado');
+  const [contenido, setContenido] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  // Cargar contenido desde Supabase (igual que Hero)
+  useEffect(() => {
+    async function loadContenido() {
+      try {
+        console.log('🔄 Cargando contenido de contacto...');
+        console.log('⏰ Timestamp:', new Date().toISOString());
+        
+        // Llamada directa a Supabase sin cache
+        const { data, error } = await supabase
+          .from('contenido')
+          .select('*')
+          .eq('seccion', 'contacto')
+          .order('orden', { ascending: true });
+
+        if (error) {
+          console.error('❌ Error de Supabase:', error);
+          throw error;
+        }
+
+        console.log('📦 Datos RAW de Supabase:', data);
+        console.log('📊 Cantidad de registros:', data?.length || 0);
+        
+        if (!data || data.length === 0) {
+          console.warn('⚠️ No hay datos para la sección "contacto"');
+          setContenido({});
+          return;
+        }
+        
+        // Organizar contenido por ID para fácil acceso (igual que Hero)
+        const contenidoOrganizado = {};
+        data.forEach((item, index) => {
+          contenidoOrganizado[item.id] = item.contenido;
+          console.log(`📋 [${index}] ${item.id}: "${item.contenido}"`);
+        });
+        
+        console.log('✅ Contenido organizado:', contenidoOrganizado);
+        setContenido(contenidoOrganizado);
+        
+        // Mostrar específicamente el teléfono para debug
+        console.log('📱 Teléfono en state:', contenidoOrganizado['contacto-telefono']);
+        
+      } catch (error) {
+        console.error('❌ Error cargando contenido de contacto:', error);
+        setContenido({});
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadContenido();
+
+    // Recargar contenido cada 2 segundos para ver cambios MÁS rápido
+    const interval = setInterval(() => {
+      console.log('🔄 Recargando contenido automáticamente...');
+      loadContenido();
+    }, 2000);
+
+    // Limpiar interval cuando el componente se desmonte
+    return () => clearInterval(interval);
+  }, []);
+
+  // Funciones para manejar clicks en contacto
+  const handleWhatsApp = () => {
+    const numero = contenido['contacto-whatsapp']?.replace(/[^\d]/g, '') || contenido['contacto-telefono']?.replace(/[^\d]/g, '') || '5492611234567';
+    const mensaje = `Hola, me interesa agendar una consulta`;
+    window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`, '_blank');
   };
 
+  const handleEmail = () => {
+    const email = contenido['contacto-email'] || 'contacto@ejemplo.com';
+    const asunto = 'Consulta - Sesión';
+    window.open(`mailto:${email}?subject=${encodeURIComponent(asunto)}`, '_blank');
+  };
+
+  const handlePhone = () => {
+    const telefono = contenido['contacto-telefono'] || '+5492611234567';
+    window.open(`tel:${telefono}`, '_self');
+  };
+
+  if (loading) {
+    return (
+      <section id="contacto" className="py-16 bg-oliva text-white">
+        <div className="px-4">
+          <div className="max-w-sm mx-auto text-center">
+            <div className="animate-pulse space-y-6">
+              <div className="h-8 bg-white/20 rounded mx-auto w-3/4"></div>
+              <div className="h-6 bg-white/20 rounded mx-auto w-1/2"></div>
+              <div className="space-y-3">
+                <div className="h-12 bg-white/20 rounded"></div>
+                <div className="h-12 bg-white/20 rounded"></div>
+                <div className="h-12 bg-white/20 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section id="contact" className="py-16 bg-rosa text-white">
+    <section id="contacto" className="py-16 bg-oliva text-white">
       <div className="px-4">
-        <div className="max-w-sm mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">
-              ¿Hablamos?
+        <div className="max-w-sm mx-auto text-center space-y-8">
+          
+          {/* Título principal */}
+          <div className="space-y-4">
+            <h2 className="text-3xl font-bold">
+              {contenido['contacto-titulo'] || '¿Listo para comenzar?'}
             </h2>
-            <p className="text-white/80">
-              Estoy aquí para ayudarte. El primer paso es el más importante.
+            
+            {/* Subtítulo */}
+            <p className="text-xl text-olivaclaro">
+              {contenido['contacto-subtitulo'] || 'Contáctame para agendar tu primera sesión'}
+            </p>
+            
+            {/* Descripción */}
+            <p className="text-white/90 leading-relaxed">
+              {contenido['contacto-descripcion'] || 'Estoy aquí para acompañarte en tu proceso de crecimiento personal.'}
             </p>
           </div>
 
           {/* Información de contacto */}
-          <div className="space-y-6 mb-8">
-            <a href="tel:+79991234567" className="flex items-center space-x-4 bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors">
-              <div className="bg-white/20 p-3 rounded-xl">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-              </div>
-              <div>
-                <div className="font-semibold">Llamar ahora</div>
-                <div className="text-white/70 text-sm">+7 (999) 123-45-67</div>
-              </div>
-            </a>
-
-            <a href="mailto:info@kuzmina-psycholog.ru" className="flex items-center space-x-4 bg-white/20 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/30 transition-colors">
-              <div className="bg-white/20 p-3 rounded-xl">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <div>
-                <div className="font-semibold">Enviar email</div>
-                <div className="text-white/70 text-sm">info@kuzmina-psycholog.ru</div>
-              </div>
-            </a>
-
-            <div className="flex items-center space-x-4 bg-white/20 backdrop-blur-sm rounded-2xl p-4">
-              <div className="bg-white/20 p-3 rounded-xl">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <div>
-                <div className="font-semibold">Consultorio</div>
-                <div className="text-white/70 text-sm">Moscú, Calle de Ejemplo, 123</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Formulario rápido */}
-          <div className="bg-white rounded-2xl p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">
-              Solicitar consulta
-            </h3>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="text"
-                placeholder="Tu nombre"
-                className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-oliva focus:border-transparent text-gray-900"
-                required
-              />
-              
-              <input
-                type="tel"
-                placeholder="+7 (999) 123-45-67"
-                className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-oliva focus:border-transparent text-gray-900"
-                required
-              />
-              
-              <select 
-                className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-oliva focus:border-transparent text-gray-900"
-                required
-              >
-                <option value="">Selecciona un servicio</option>
-                <option value="online">Consulta online</option>
-                <option value="individual">Terapia individual</option>
-                <option value="pareja">Terapia de pareja</option>
-              </select>
-              
-              <textarea
-                rows={3}
-                placeholder="Cuéntame brevemente sobre tu consulta..."
-                className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-oliva focus:border-transparent text-gray-900"
-              />
-              
+          <div className="space-y-4">
+            {/* Teléfono */}
+            {contenido['contacto-telefono'] && (
               <button
-                type="submit"
-                className="w-full bg-oliva text-white py-4 px-6 font-semibold rounded-xl hover:bg-oliva/90 transition-colors"
+                onClick={handlePhone}
+                className="flex items-center justify-center space-x-3 w-full p-4 bg-white/10 rounded-xl hover:bg-white/20 transition-all duration-200 transform hover:scale-105"
               >
-                Enviar solicitud
+                <Phone className="w-5 h-5" />
+                <span className="font-medium">{contenido['contacto-telefono']}</span>
               </button>
-            </form>
+            )}
+
+            {/* Email */}
+            {contenido['contacto-email'] && (
+              <button
+                onClick={handleEmail}
+                className="flex items-center justify-center space-x-3 w-full p-4 bg-white/10 rounded-xl hover:bg-white/20 transition-all duration-200 transform hover:scale-105"
+              >
+                <Mail className="w-5 h-5" />
+                <span className="font-medium">{contenido['contacto-email']}</span>
+              </button>
+            )}
+
+            {/* WhatsApp */}
+            {contenido['contacto-whatsapp'] && (
+              <button
+                onClick={handleWhatsApp}
+                className="flex items-center justify-center space-x-3 w-full p-4 bg-green-600 rounded-xl hover:bg-green-700 transition-all duration-200 transform hover:scale-105 shadow-lg"
+              >
+                <MessageCircle className="w-5 h-5" />
+                <span className="font-medium">{contenido['contacto-whatsapp']}</span>
+              </button>
+            )}
+
+            {/* Horarios */}
+            {contenido['contacto-horarios'] && (
+              <div className="flex items-center justify-center space-x-3 p-4 bg-white/10 rounded-xl">
+                <Clock className="w-5 h-5" />
+                <span className="font-medium">{contenido['contacto-horarios']}</span>
+              </div>
+            )}
+
+            {/* Ubicación */}
+            {contenido['contacto-ubicacion'] && (
+              <div className="flex items-center justify-center space-x-3 p-4 bg-white/10 rounded-xl">
+                <MapPin className="w-5 h-5" />
+                <span className="font-medium">{contenido['contacto-ubicacion']}</span>
+              </div>
+            )}
           </div>
 
-          {/* Horarios */}
-          <div className="mt-8 text-center">
-            <div className="text-white/70 text-sm mb-2">Horarios de atención</div>
-            <div className="font-semibold">Lunes a viernes: 9:00 - 20:00</div>
-            <div className="text-white/70 text-sm">Sábados y domingos: con cita previa</div>
+          {/* Botones de acción principales */}
+          <div className="space-y-3">
+            {/* Botón principal */}
+            {contenido['contacto-boton-principal'] && (
+              <button
+                onClick={handleWhatsApp}
+                className="w-full bg-rosa text-white py-4 px-6 rounded-full font-semibold hover:bg-rosa/90 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                {contenido['contacto-boton-principal']}
+              </button>
+            )}
+
+            {/* Botón WhatsApp */}
+            {contenido['contacto-boton-whatsapp'] && (
+              <button
+                onClick={handleWhatsApp}
+                className="w-full bg-green-600 text-white py-4 px-6 rounded-full font-semibold hover:bg-green-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                {contenido['contacto-boton-whatsapp']}
+              </button>
+            )}
           </div>
+
         </div>
       </div>
     </section>
